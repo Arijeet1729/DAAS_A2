@@ -263,3 +263,80 @@ Scenario: Bankrupt player was already absent from players list
 Input: Player balance = 0, player not present in `self.players`
 Expected Output: No removal error occurs, cleanup still completes safely
 Why needed (IMPORTANT): Covers the false branch of `if player in self.players` and validates defensive behavior.
+
+Test Case ID: TC-B-005
+Function: Bank.collect
+Scenario: Negative collection amount is passed to the bank
+Input: Bank funds = 20580, amount = -100
+Expected Output: Bank funds remain unchanged because negative amounts should be ignored
+Why needed (IMPORTANT): Validates the documented contract for negative inputs and catches accounting inconsistencies between implementation and docstring.
+
+Test Case ID: TC-G-022
+Function: Game.buy_property
+Scenario: Attempt to buy a property that is already owned by another player
+Input: Buyer balance = 1500, property price = 100, property owner = another player
+Expected Output: Return value = False, ownership stays with the original owner, buyer holdings remain unchanged
+Why needed (IMPORTANT): Covers an ownership integrity edge case that should prevent duplicate purchase of an already owned asset.
+
+Test Case ID: TC-G-023
+Function: Game.trade
+Scenario: Negative cash amount is provided for a trade
+Input: Seller owns property, buyer balance = 1500, `cash_amount = -10`
+Expected Output: Trade is rejected cleanly without exceptions, balances unchanged, ownership unchanged
+Why needed (IMPORTANT): Validates defensive input handling and ensures invalid negative trade values do not crash the game.
+
+Test Case ID: TC-G-024
+Function: Game._apply_card
+Scenario: Move-to card lands on a special tax tile
+Input: Player position = 5, `card = {"action": "move_to", "value": 38, ...}` where position 38 is luxury tax
+Expected Output: Player position becomes 38 and luxury tax is applied, reducing balance by 75
+Why needed (IMPORTANT): Verifies whether movement cards trigger full tile resolution for special tiles instead of only property-style tiles.
+
+Test Case ID: TC-G-025
+Function: Game._check_bankruptcy
+Scenario: Earlier player is removed while current player index points to a later player
+Input: Players = [Alice, Bob, Cara], `current_index = 2`, Alice balance = 0
+Expected Output: Alice is removed, and the current turn should still point to Cara after index adjustment
+Why needed (IMPORTANT): Covers a state-based list-mutation edge case that can silently shift turn order after bankruptcy removal.
+
+Test Case ID: TC-G-026
+Function: Game.auction_property
+Scenario: A player is outbid but should still be able to bid again in a later round
+Input: Two-player auction with bids sequence conceptually like Alice 50, Bob 60, Alice 70, Bob pass
+Expected Output: Auction continues in multiple rounds until only one bidder remains, and Alice wins at 70
+Why needed (IMPORTANT): Validates whether auction flow supports realistic repeated bidding rather than a single pass through players.
+
+Test Case ID: TC-G-027
+Function: Game._apply_card
+Scenario: Collect-from-all card with all other players at zero money
+Input: Three players, both other players have balance = 0, `card = {"action": "collect_from_all", "value": 50, ...}`
+Expected Output: Current player balance is unchanged, other players remain at zero, no exception raised
+Why needed (IMPORTANT): Covers zero-money edge cases in player-to-player transfer loops and ensures safe no-op behavior.
+
+Test Case ID: TC-G-028
+Function: Game._apply_card
+Scenario: Birthday card with a very large value that no player can afford
+Input: Three players with normal starting balances, `card = {"action": "birthday", "value": 100000, ...}`
+Expected Output: No transfers occur, all balances remain unchanged
+Why needed (IMPORTANT): Covers a very large input edge case and verifies that affordability guards prevent impossible transfers.
+
+Test Case ID: TC-G-029
+Function: Game._check_bankruptcy
+Scenario: Multiple players are bankrupt one after another
+Input: Three-player game where two players have balance = 0 and are checked sequentially
+Expected Output: Both bankrupt players are removed safely, remaining player stays active, and player list remains consistent after consecutive removals
+Why needed (IMPORTANT): Stress-tests repeated state mutation on the shared players list and turn index across multiple eliminations.
+
+Test Case ID: TC-P-010
+Function: Player.add_money
+Scenario: Add a very large positive amount
+Input: Player balance = 1500, amount = 1000000
+Expected Output: Balance becomes 1001500
+Why needed (IMPORTANT): Covers a large-value edge case to ensure no unexpected overflow-style logic errors or truncation in balance updates.
+
+Test Case ID: TC-P-011
+Function: Player.deduct_money
+Scenario: Deduct an amount larger than the current balance
+Input: Player balance = 10, amount = 1000
+Expected Output: Balance becomes -990, no exception raised
+Why needed (IMPORTANT): Verifies the current contract around overdraft-style deductions and supports downstream bankruptcy behavior testing.
