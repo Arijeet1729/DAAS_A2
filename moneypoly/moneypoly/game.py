@@ -138,6 +138,9 @@ class Game:  # pylint: disable=too-many-instance-attributes
         Purchase `prop` on behalf of `player`.
         Returns True on success, False if the player cannot afford it.
         """
+        if prop.owner is not None:
+            print(f"  {prop.name} is already owned by {prop.owner.name}.")
+            return False
         if player.balance < prop.price:
             print(f"  {player.name} cannot afford {prop.name} (${prop.price}).")
             return False
@@ -203,6 +206,9 @@ class Game:  # pylint: disable=too-many-instance-attributes
         if prop.owner != seller:
             print(f"  Trade failed: {seller.name} does not own {prop.name}.")
             return False
+        if cash_amount < 0:
+            print(f"  Trade failed: negative cash amount ${cash_amount} is invalid.")
+            return False
         if buyer.balance < cash_amount:
             print(f"  Trade failed: {buyer.name} cannot afford ${cash_amount}.")
             return False
@@ -223,24 +229,36 @@ class Game:  # pylint: disable=too-many-instance-attributes
         print(f"\n  [Auction] Bidding on {prop.name} (listed at ${prop.price})")
         highest_bid = 0
         highest_bidder = None
+        active_bidders = list(self.players)
 
-        for player in self.players:
-            print(f"  {player.name}'s bid (balance: ${player.balance}, "
-                  f"current high: ${highest_bid}):")
-            bid = ui.safe_int_input("  Enter amount (0 to pass): ", default=0)
-            if bid <= 0:
-                print(f"  {player.name} passes.")
-                continue
-            min_required = highest_bid + AUCTION_MIN_INCREMENT
-            if bid < min_required:
-                print(f"  Bid too low — minimum raise is ${AUCTION_MIN_INCREMENT}.")
-                continue
-            if bid > player.balance:
-                print(f"  {player.name} cannot afford ${bid}.")
-                continue
-            highest_bid = bid
-            highest_bidder = player
-            print(f"  {player.name} bids ${bid}.")
+        while len(active_bidders) > 1:
+            next_round = []
+            for player in active_bidders:
+                print(
+                    f"  {player.name}'s bid (balance: ${player.balance}, "
+                    f"current high: ${highest_bid}):"
+                )
+                bid = ui.safe_int_input("  Enter amount (0 to pass): ", default=0)
+                if bid <= 0:
+                    print(f"  {player.name} passes.")
+                    continue
+                min_required = highest_bid + AUCTION_MIN_INCREMENT
+                if bid < min_required:
+                    print(f"  Bid too low — minimum raise is ${AUCTION_MIN_INCREMENT}.")
+                    continue
+                if bid > player.balance:
+                    print(f"  {player.name} cannot afford ${bid}.")
+                    continue
+                highest_bid = bid
+                highest_bidder = player
+                next_round = [p for p in next_round if p != player]
+                next_round.append(player)
+                print(f"  {player.name} bids ${bid}.")
+            if not next_round:
+                break
+            active_bidders = next_round
+            if len(active_bidders) == 1:
+                break
 
         if highest_bidder is not None:
             highest_bidder.deduct_money(highest_bid)
@@ -323,6 +341,18 @@ class Game:  # pylint: disable=too-many-instance-attributes
             prop = self.board.get_property_at(value)
             if prop:
                 self._handle_property_tile(player, prop)
+        elif tile == "income_tax":
+            player.deduct_money(INCOME_TAX_AMOUNT)
+            self.bank.collect(INCOME_TAX_AMOUNT)
+        elif tile == "luxury_tax":
+            player.deduct_money(LUXURY_TAX_AMOUNT)
+            self.bank.collect(LUXURY_TAX_AMOUNT)
+        elif tile == "go_to_jail":
+            player.go_to_jail()
+        elif tile == "chance":
+            self._apply_card(player, self.chance_deck.draw())
+        elif tile == "community_chest":
+            self._apply_card(player, self.community_deck.draw())
 
     def _collect_from_players(self, player, value):
         for other in self.players:
@@ -371,7 +401,10 @@ class Game:  # pylint: disable=too-many-instance-attributes
                 prop.is_mortgaged = False
             player.properties.clear()
             if player in self.players:
+                removed_index = self.players.index(player)
                 self.players.remove(player)
+                if removed_index < self.current_index:
+                    self.current_index -= 1
             if self.current_index >= len(self.players):
                 self.current_index = 0
 

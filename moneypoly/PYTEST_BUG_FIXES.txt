@@ -1,0 +1,151 @@
+Error 1
+Old code:
+```python
+def collect(self, amount):
+    self._funds += amount
+    self._total_collected += amount
+```
+New code:
+```python
+def collect(self, amount):
+    if amount < 0:
+        return
+    self._funds += amount
+    self._total_collected += amount
+```
+Explanation:
+`Bank.collect()` now matches its documented contract by ignoring negative amounts instead of reducing bank funds.
+
+Error 2
+Old code:
+```python
+def buy_property(self, player, prop):
+    if player.balance < prop.price:
+        ...
+```
+New code:
+```python
+def buy_property(self, player, prop):
+    if prop.owner is not None:
+        print(f"  {prop.name} is already owned by {prop.owner.name}.")
+        return False
+    if player.balance < prop.price:
+        ...
+```
+Explanation:
+`Game.buy_property()` now rejects attempts to buy a property that is already owned, preventing ownership corruption.
+
+Error 3
+Old code:
+```python
+def _apply_move_to_card(self, player, value):
+    ...
+    if tile in {"property", "railroad"}:
+        prop = self.board.get_property_at(value)
+        if prop:
+            self._handle_property_tile(player, prop)
+```
+New code:
+```python
+def _apply_move_to_card(self, player, value):
+    ...
+    if tile in {"property", "railroad"}:
+        prop = self.board.get_property_at(value)
+        if prop:
+            self._handle_property_tile(player, prop)
+    elif tile == "income_tax":
+        player.deduct_money(INCOME_TAX_AMOUNT)
+        self.bank.collect(INCOME_TAX_AMOUNT)
+    elif tile == "luxury_tax":
+        player.deduct_money(LUXURY_TAX_AMOUNT)
+        self.bank.collect(LUXURY_TAX_AMOUNT)
+    elif tile == "go_to_jail":
+        player.go_to_jail()
+    elif tile == "chance":
+        self._apply_card(player, self.chance_deck.draw())
+    elif tile == "community_chest":
+        self._apply_card(player, self.community_deck.draw())
+```
+Explanation:
+Card-based movement now resolves special destination tiles instead of stopping after only property and railroad handling.
+
+Error 4
+Old code:
+```python
+if player in self.players:
+    self.players.remove(player)
+if self.current_index >= len(self.players):
+    self.current_index = 0
+```
+New code:
+```python
+if player in self.players:
+    removed_index = self.players.index(player)
+    self.players.remove(player)
+    if removed_index < self.current_index:
+        self.current_index -= 1
+if self.current_index >= len(self.players):
+    self.current_index = 0
+```
+Explanation:
+`Game._check_bankruptcy()` now preserves turn order when a removed player was earlier in the rotation than the current player.
+
+Error 5
+Old code:
+```python
+def trade(self, seller, buyer, prop, cash_amount):
+    if prop.owner != seller:
+        ...
+    if buyer.balance < cash_amount:
+        ...
+    buyer.deduct_money(cash_amount)
+```
+New code:
+```python
+def trade(self, seller, buyer, prop, cash_amount):
+    if prop.owner != seller:
+        ...
+    if cash_amount < 0:
+        print(f"  Trade failed: negative cash amount ${cash_amount} is invalid.")
+        return False
+    if buyer.balance < cash_amount:
+        ...
+    buyer.deduct_money(cash_amount)
+```
+Explanation:
+`Game.trade()` now validates negative cash amounts up front and fails gracefully instead of raising a lower-level balance exception.
+
+Error 6
+Old code:
+```python
+for player in self.players:
+    ...
+    if bid <= 0:
+        continue
+    ...
+    highest_bid = bid
+    highest_bidder = player
+```
+New code:
+```python
+active_bidders = list(self.players)
+
+while len(active_bidders) > 1:
+    next_round = []
+    for player in active_bidders:
+        ...
+        if bid <= 0:
+            continue
+        ...
+        highest_bid = bid
+        highest_bidder = player
+        next_round = [p for p in next_round if p != player]
+        next_round.append(player)
+    if not next_round:
+        break
+    active_bidders = next_round
+    if len(active_bidders) == 1:
+        break
+```
+Explanation:
+`Game.auction_property()` now supports additional bidding rounds after an outbid player responds, instead of ending after a single pass.
