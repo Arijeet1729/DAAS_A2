@@ -1,9 +1,10 @@
 from unittest.mock import patch
 
+from moneypoly.cards import CardDeck
 from moneypoly.dice import Dice
 from moneypoly.game import Game
 from moneypoly.player import Player
-from moneypoly.property import Property
+from moneypoly.property import Property, PropertyGroup
 
 
 def test_player_collects_salary_when_passing_go():
@@ -63,3 +64,66 @@ def test_find_winner_returns_highest_net_worth_player():
     winner = game.find_winner()
 
     assert winner.name == "Bob"
+
+
+def test_group_bonus_requires_full_group_ownership():
+    group = PropertyGroup("Test", "test")
+    owner = Player("Alice")
+    other = Player("Bob")
+    first = Property("First", 1, 100, 10, group)
+    second = Property("Second", 3, 100, 10, group)
+    first.owner = owner
+    second.owner = other
+
+    assert first.get_rent() == 10
+
+
+def test_empty_card_deck_is_safe_to_query():
+    deck = CardDeck([])
+
+    assert deck.cards_remaining() == 0
+    assert repr(deck) == "CardDeck(0 cards, next=empty)"
+
+
+def test_unmortgage_does_not_change_state_when_player_cannot_afford_it():
+    game = Game(["Alice", "Bob"])
+    player = game.players[0]
+    prop = Property("Test Avenue", 1, 100, 10)
+    prop.owner = player
+    player.add_property(prop)
+    prop.is_mortgaged = True
+    player.balance = 54
+
+    success = game.unmortgage_property(player, prop)
+
+    assert success is False
+    assert prop.is_mortgaged is True
+
+
+def test_trade_credits_seller_with_cash_amount():
+    game = Game(["Alice", "Bob"])
+    seller = game.players[0]
+    buyer = game.players[1]
+    prop = Property("Test Avenue", 1, 100, 10)
+    prop.owner = seller
+    seller.add_property(prop)
+
+    success = game.trade(seller, buyer, prop, 200)
+
+    assert success is True
+    assert seller.balance == 1700
+    assert buyer.balance == 1300
+
+
+def test_voluntary_jail_fine_deducts_player_balance():
+    game = Game(["Alice", "Bob"])
+    player = game.players[0]
+    player.in_jail = True
+
+    with patch("moneypoly.ui.confirm", return_value=True), patch.object(
+        game.dice, "roll", return_value=2
+    ), patch.object(game, "_move_and_resolve") as move_and_resolve:
+        game._handle_jail_turn(player)
+
+    assert player.balance == 1450
+    move_and_resolve.assert_called_once_with(player, 2)

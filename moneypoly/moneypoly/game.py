@@ -181,13 +181,14 @@ class Game:
         if prop.owner != player:
             print(f"  {player.name} does not own {prop.name}.")
             return False
-        cost = prop.unmortgage()
-        if cost == 0:
+        if not prop.is_mortgaged:
             print(f"  {prop.name} is not mortgaged.")
             return False
+        cost = int(prop.mortgage_value * 1.1)
         if player.balance < cost:
             print(f"  {player.name} cannot afford to unmortgage {prop.name} (${cost}).")
             return False
+        prop.unmortgage()
         player.deduct_money(cost)
         self.bank.collect(cost)
         print(f"  {player.name} unmortgaged {prop.name} for ${cost}.")
@@ -207,6 +208,7 @@ class Game:
             return False
 
         buyer.deduct_money(cash_amount)
+        seller.add_money(cash_amount)
         prop.owner = buyer
         seller.remove_property(prop)
         buyer.add_property(prop)
@@ -270,6 +272,7 @@ class Game:
 
         # Offer to pay the fine voluntarily
         if ui.confirm(f"  Pay ${JAIL_FINE} fine to leave jail? (y/n): "):
+            player.deduct_money(JAIL_FINE)
             self.bank.collect(JAIL_FINE)
             player.in_jail = False
             player.jail_turns = 0
