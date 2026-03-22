@@ -2986,6 +2986,107 @@ Request:
 Expected Response: 400 Bad Request
 Why this test is important: Confirms missing X-User-ID handling for invoice retrieval.
 
+Module: tests/test_reviews.py
+Test Case ID: REV-PY-001
+Endpoint: POST /api/v1/products/{product_id}/reviews
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/products/1/reviews
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"rating":5,"comment":"a"}
+Expected Response: Success response with a review identifier
+Why this test is important: Verifies the minimum valid comment-length boundary.
+
+Test Case ID: REV-PY-002
+Endpoint: POST /api/v1/products/{product_id}/reviews
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/products/1/reviews
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"rating":5,"comment":"<200 characters>"}
+Expected Response: Success response with a review identifier
+Why this test is important: Verifies the maximum valid comment-length boundary.
+
+Test Case ID: REV-PY-003
+Endpoint: GET /api/v1/products/{product_id}/reviews
+Type: Edge
+Request:
+  Method: GET
+  URL: /api/v1/products/250/reviews
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 200 OK with average_rating 0 and an empty reviews list
+Why this test is important: Confirms the no-reviews edge case is handled exactly as documented.
+
+Test Case ID: REV-PY-004
+Endpoint: POST /api/v1/products/{product_id}/reviews
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/products/1/reviews
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"rating":5,"comment":"review-structure-<id>"}
+Expected Response: Success response containing a review identifier
+Why this test is important: Validates the returned response structure after review creation.
+
+Module: tests/test_support.py
+Test Case ID: SUP-PY-001
+Endpoint: PUT /api/v1/support/tickets/{ticket_id}
+Type: Valid
+Request:
+  Method: PUT
+  URL: /api/v1/support/tickets/{ticket_id}
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: First {"status":"IN_PROGRESS"}, then {"status":"CLOSED"}
+Expected Response: Both updates succeed and the ticket status follows OPEN -> IN_PROGRESS -> CLOSED
+Why this test is important: Verifies the full valid support-ticket lifecycle.
+
+Test Case ID: SUP-PY-002
+Endpoint: PUT /api/v1/support/tickets/{ticket_id}
+Type: Invalid
+Request:
+  Method: PUT
+  URL: /api/v1/support/tickets/{ticket_id}
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"status":"CLOSED"} directly from OPEN
+Expected Response: 400 Bad Request
+Why this test is important: Confirms invalid state transitions are rejected.
+
+Test Case ID: SUP-PY-003
+Endpoint: POST /api/v1/support/ticket
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/support/ticket
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"subject":"Exact message subject","message":"Need exact text: 123, punctuation, spaces."}
+Expected Response: Success response and later retrieval shows the message stored exactly
+Why this test is important: Verifies message persistence without alteration.
+
+Test Case ID: SUP-PY-004
+Endpoint: POST /api/v1/support/ticket
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/support/ticket
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"subject":"ABCDE","message":"Z"}
+Expected Response: Success response
+Why this test is important: Verifies the minimum valid subject and message boundaries.
+
+Test Case ID: SUP-PY-005
+Endpoint: POST /api/v1/support/ticket
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/support/ticket
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"subject":"<100 characters>","message":"<500 characters>"}
+Expected Response: Success response with subject and message preserved
+Why this test is important: Verifies the maximum valid subject and message boundaries.
+
 Module: tests/test_coupon.py
 Test Case ID: CPN-PY-001
 Endpoint: POST /api/v1/coupon/apply

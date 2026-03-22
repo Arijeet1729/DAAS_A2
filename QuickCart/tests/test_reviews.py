@@ -80,6 +80,59 @@ def test_post_review_with_too_long_comment_returns_400():
     assert "error" in response.json()
 
 
+def test_post_review_with_comment_length_one_is_valid():
+    response = requests.post(
+        f"{BASE_URL}/products/1/reviews",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"rating": 5, "comment": "a"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code in (200, 201)
+    payload = response.json()
+    assert "review_id" in payload
+
+
+def test_post_review_with_comment_length_two_hundred_is_valid():
+    response = requests.post(
+        f"{BASE_URL}/products/1/reviews",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"rating": 5, "comment": "x" * 200},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code in (200, 201)
+    payload = response.json()
+    assert "review_id" in payload
+
+
+def test_no_reviews_returns_average_rating_zero():
+    response = requests.get(
+        f"{BASE_URL}/products/250/reviews",
+        headers=request_headers(1),
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["average_rating"] == 0
+    assert payload["reviews"] == []
+
+
+def test_review_post_response_structure_contains_review_identifier():
+    response = requests.post(
+        f"{BASE_URL}/products/1/reviews",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"rating": 5, "comment": f"review-structure-{uuid.uuid4().hex[:8]}"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code in (200, 201)
+    payload = response.json()
+    assert isinstance(payload, dict)
+    assert "review_id" in payload
+
+
 def test_average_rating_is_correct_decimal():
     response = requests.get(
         f"{BASE_URL}/products/1/reviews",
