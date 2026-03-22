@@ -4,6 +4,19 @@ import requests
 from .conftest import BASE_URL, TIMEOUT, assert_keys, request_headers
 
 
+ADMIN_ENDPOINTS = [
+    "/admin/users",
+    "/admin/products",
+    "/admin/orders",
+]
+
+USER_ENDPOINTS = [
+    "/profile",
+    "/products",
+    "/wallet",
+]
+
+
 def test_admin_users_with_valid_roll_number_returns_200_and_list():
     response = requests.get(
         f"{BASE_URL}/admin/users",
@@ -18,28 +31,33 @@ def test_admin_users_with_valid_roll_number_returns_200_and_list():
     assert_keys(payload[0], ["user_id", "name", "email", "wallet_balance", "loyalty_points"])
 
 
-def test_admin_users_without_roll_number_returns_401():
-    response = requests.get(f"{BASE_URL}/admin/users", timeout=TIMEOUT)
+@pytest.mark.parametrize("endpoint", ADMIN_ENDPOINTS + USER_ENDPOINTS)
+def test_missing_roll_number_returns_401(endpoint):
+    headers = {"X-User-ID": "1"} if endpoint in USER_ENDPOINTS else None
+
+    response = requests.get(f"{BASE_URL}{endpoint}", headers=headers, timeout=TIMEOUT)
 
     assert response.status_code == 401
     assert "error" in response.json()
 
 
-def test_admin_users_with_invalid_roll_number_raises_http_error():
-    response = requests.get(
-        f"{BASE_URL}/admin/users",
-        headers={"X-Roll-Number": "abc"},
-        timeout=TIMEOUT,
-    )
+@pytest.mark.parametrize("endpoint", ADMIN_ENDPOINTS + USER_ENDPOINTS)
+def test_invalid_roll_number_string_returns_400(endpoint):
+    headers = {"X-Roll-Number": "abc"}
+    if endpoint in USER_ENDPOINTS:
+        headers["X-User-ID"] = "1"
+
+    response = requests.get(f"{BASE_URL}{endpoint}", headers=headers, timeout=TIMEOUT)
 
     assert response.status_code == 400
     with pytest.raises(requests.HTTPError):
         response.raise_for_status()
 
 
-def test_profile_without_user_id_returns_400():
+@pytest.mark.parametrize("endpoint", USER_ENDPOINTS)
+def test_missing_user_id_returns_400(endpoint):
     response = requests.get(
-        f"{BASE_URL}/profile",
+        f"{BASE_URL}{endpoint}",
         headers={"X-Roll-Number": "123"},
         timeout=TIMEOUT,
     )
@@ -48,10 +66,11 @@ def test_profile_without_user_id_returns_400():
     assert "error" in response.json()
 
 
-def test_profile_with_zero_user_id_returns_400():
+@pytest.mark.parametrize("endpoint,user_id", [("/profile", "abc"), ("/products", "abc"), ("/wallet", "0")])
+def test_invalid_user_id_returns_400(endpoint, user_id):
     response = requests.get(
-        f"{BASE_URL}/profile",
-        headers=request_headers(0),
+        f"{BASE_URL}{endpoint}",
+        headers=request_headers(user_id),
         timeout=TIMEOUT,
     )
 
