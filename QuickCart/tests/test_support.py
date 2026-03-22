@@ -63,3 +63,17 @@ def test_update_unknown_ticket_returns_404():
 
     assert response.status_code == 404
     assert "error" in response.json()
+
+
+def test_support_ticket_invalid_status_transition_returns_400(created_ticket):
+    ticket_id = created_ticket["ticket_id"]
+
+    response = requests.put(
+        f"{BASE_URL}/support/tickets/{ticket_id}",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"status": "CLOSED"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 400
+    assert "error" in response.json()

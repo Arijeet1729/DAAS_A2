@@ -73,3 +73,25 @@ def test_apply_coupon_without_user_header_returns_400(clean_cart):
 
     assert response.status_code == 400
     assert "error" in response.json()
+
+
+def test_coupon_discount_respects_max_discount_cap(clean_cart):
+    requests.post(
+        f"{BASE_URL}/cart/add",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"product_id": 5, "quantity": 4},
+        timeout=TIMEOUT,
+    )
+
+    response = requests.post(
+        f"{BASE_URL}/coupon/apply",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"coupon_code": "PERCENT30"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["coupon_code"] == "PERCENT30"
+    assert payload["discount"] == 300
+    assert payload["new_total"] == 700

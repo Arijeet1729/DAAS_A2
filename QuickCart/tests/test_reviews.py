@@ -1,5 +1,6 @@
 import uuid
 
+import pytest
 import requests
 
 from .conftest import BASE_URL, TIMEOUT, assert_keys, request_headers
@@ -53,3 +54,41 @@ def test_get_reviews_for_missing_product_returns_404():
 
     assert response.status_code == 404
     assert "error" in response.json()
+
+
+def test_post_review_with_rating_six_returns_400():
+    response = requests.post(
+        f"{BASE_URL}/products/1/reviews",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"rating": 6, "comment": "bad"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+def test_post_review_with_too_long_comment_returns_400():
+    response = requests.post(
+        f"{BASE_URL}/products/1/reviews",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"rating": 5, "comment": "x" * 201},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+def test_average_rating_is_correct_decimal():
+    response = requests.get(
+        f"{BASE_URL}/products/1/reviews",
+        headers=request_headers(1),
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    ratings = [review["rating"] for review in payload["reviews"]]
+    expected_average = sum(ratings) / len(ratings) if ratings else 0
+    assert payload["average_rating"] == pytest.approx(expected_average)

@@ -46,3 +46,46 @@ def test_checkout_with_invalid_payment_method_returns_400(clean_cart):
 
     assert response.status_code == 400
     assert "error" in response.json()
+
+
+def test_checkout_with_cod_over_5000_returns_400(clean_cart):
+    requests.post(
+        f"{BASE_URL}/cart/add",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"product_id": 5, "quantity": 21},
+        timeout=TIMEOUT,
+    )
+
+    response = requests.post(
+        f"{BASE_URL}/checkout",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"payment_method": "COD"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+def test_checkout_adds_gst_exactly_once(clean_cart):
+    requests.post(
+        f"{BASE_URL}/cart/add",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"product_id": 1, "quantity": 2},
+        timeout=TIMEOUT,
+    )
+
+    response = requests.post(
+        f"{BASE_URL}/checkout",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"payment_method": "CARD"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    expected_subtotal = 120 * 2
+    expected_gst = round(expected_subtotal * 0.05, 2)
+    expected_total = round(expected_subtotal + expected_gst, 2)
+    assert payload["gst_amount"] == expected_gst
+    assert payload["total_amount"] == expected_total

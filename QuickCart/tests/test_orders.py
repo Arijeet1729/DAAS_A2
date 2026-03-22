@@ -45,3 +45,14 @@ def test_get_unknown_order_returns_404():
 
     assert response.status_code == 404
     assert "error" in response.json()
+
+
+def test_cancel_delivered_order_returns_400():
+    response = requests.post(
+        f"{BASE_URL}/orders/2038/cancel",
+        headers=request_headers(1),
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 400
+    assert "error" in response.json()
