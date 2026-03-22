@@ -1,0 +1,371 @@
+File: main.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a short module-level docstring describing the program entry point.
+Reason: Missing top-level documentation lowers readability and is flagged by pylint.
+
+File: main.py
+Issue: Missing function or method docstring for `get_player_names` (`missing-function-docstring`)
+Type: Style (PEP8)
+Fix: Add a concise docstring describing the prompt and returned player-name list.
+Reason: Public functions should document behavior clearly for maintainability.
+
+File: main.py
+Issue: Missing function or method docstring for `main` (`missing-function-docstring`)
+Type: Style (PEP8)
+Fix: Add a concise docstring describing setup and game startup behavior.
+Reason: Entry-point functions should be documented clearly for readers and tools.
+
+File: moneypoly/board.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a module-level docstring summarizing board responsibilities.
+Reason: Pylint expects modules to describe their purpose.
+
+File: moneypoly/board.py
+Issue: Comparison `prop.is_mortgaged == True` should use direct truthiness or `is True` (`singleton-comparison`)
+Type: Style (PEP8)
+Fix: Replace `prop.is_mortgaged == True` with `prop.is_mortgaged`.
+Reason: Direct boolean checks are clearer and more idiomatic Python.
+
+File: moneypoly/config.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a module docstring describing that the file stores game constants.
+Reason: Missing module documentation reduces clarity.
+
+File: moneypoly/property.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a module-level docstring describing property and property-group models.
+Reason: Pylint expects modules to explain their purpose.
+
+File: moneypoly/property.py
+Issue: Too many instance attributes in `Property` (`too-many-instance-attributes`)
+Type: Warning (bad design)
+Fix: Reduce stored state, group related fields, or use helper objects where appropriate.
+Reason: Too many instance attributes often indicates an overly complex class design.
+
+File: moneypoly/property.py
+Issue: Too many arguments in `Property.__init__` (`too-many-arguments`)
+Type: Warning (bad design)
+Fix: Reduce constructor parameters or encapsulate related values into a config object.
+Reason: Large parameter lists are harder to use and maintain.
+
+File: moneypoly/property.py
+Issue: Too many positional arguments in `Property.__init__` (`too-many-positional-arguments`)
+Type: Warning (bad design)
+Fix: Prefer fewer positional parameters or keyword-oriented initialization.
+Reason: Many positional arguments are error-prone and hurt readability.
+
+File: moneypoly/property.py
+Issue: Unnecessary `else` after `return` in `unmortgage` (`no-else-return`)
+Type: Style (PEP8)
+Fix: Remove the `else` block and de-indent the remaining code.
+Reason: The control flow is clearer without redundant nesting after an early return.
+
+File: moneypoly/property.py
+Issue: Missing class docstring for `PropertyGroup` (`missing-class-docstring`)
+Type: Style (PEP8)
+Fix: Add a short class docstring describing group ownership behavior.
+Reason: Public classes should explain their responsibility.
+
+File: moneypoly/ui.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a module docstring describing UI and input helper responsibilities.
+Reason: Module documentation improves readability and satisfies pylint.
+
+File: moneypoly/ui.py
+Issue: Bare `except` used in `safe_int_input` (`bare-except`)
+Type: Warning (bad design)
+Fix: Catch specific exceptions such as `ValueError`.
+Reason: Bare exceptions can hide unrelated bugs and make debugging harder.
+
+File: moneypoly/game.py
+Issue: Unnecessary parentheses after `not` (`superfluous-parens`)
+Type: Style (PEP8)
+Fix: Remove the extra parentheses around the `not` expressions.
+Reason: Extra parentheses make simple boolean conditions noisier than needed.
+
+File: moneypoly/game.py
+Issue: Unnecessary parentheses after `not` (`superfluous-parens`)
+Type: Style (PEP8)
+Fix: Remove the extra parentheses around the `not` expressions.
+Reason: Extra parentheses make simple boolean conditions noisier than needed.
+
+File: moneypoly/game.py
+Issue: Final newline missing (`missing-final-newline`)
+Type: Style (PEP8)
+Fix: Add a trailing newline at the end of the file.
+Reason: POSIX-style text files should end with a newline and tooling expects it.
+
+File: moneypoly/game.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a top-level docstring describing the main game controller.
+Reason: Module documentation improves discoverability and satisfies pylint.
+
+File: moneypoly/game.py
+Issue: Too many instance attributes in `Game` (`too-many-instance-attributes`)
+Type: Warning (bad design)
+Fix: Reduce mutable state on the class or separate responsibilities into smaller components.
+Reason: High attribute count usually signals a class that is doing too much.
+
+File: moneypoly/game.py
+Issue: Too many branches in `_apply_card` (`too-many-branches`)
+Type: Warning (bad design)
+Fix: Split card handling into smaller helper methods or a dispatch table keyed by action.
+Reason: Highly branched functions are harder to read, test, and modify safely.
+
+File: moneypoly/game.py
+Issue: Using an f-string with no interpolated variables (`f-string-without-interpolation`)
+Type: Style (PEP8)
+Fix: Replace the f-string with a normal string literal.
+Reason: An f-string without substitutions adds unnecessary syntax.
+
+File: moneypoly/game.py
+Issue: Unnecessary `elif` after `break` (`no-else-break`)
+Type: Style (PEP8)
+Fix: Remove the `el` and continue with `if` after the `break`.
+Reason: Code after a terminating branch does not need the extra `elif` nesting.
+
+File: moneypoly/game.py
+Issue: Unused import `os` (`unused-import`)
+Type: Style (PEP8)
+Fix: Remove the unused import.
+Reason: Unused imports add noise and are flagged by static analysis.
+
+File: moneypoly/game.py
+Issue: Unused import `GO_TO_JAIL_POSITION` from `moneypoly.config` (`unused-import`)
+Type: Style (PEP8)
+Fix: Remove the unused imported constant.
+Reason: Unused imports reduce clarity and suggest stale code.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 4 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 5 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 6 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 7 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 8 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 9 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 10 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 11 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 12 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 13 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 14 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 15 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 19 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 20 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 21 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 22 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 23 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 24 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 25 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 26 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 27 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 28 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 29 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Line too long at line 30 (`line-too-long`)
+Type: Style (PEP8)
+Fix: Wrap the card dictionary across multiple lines to stay within the configured limit.
+Reason: Overlong lines reduce readability and violate style limits.
+
+File: moneypoly/cards.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a module docstring describing the card decks and deck helper class.
+Reason: Module documentation is expected by pylint and improves readability.
+
+File: moneypoly/dice.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a module-level docstring describing dice behavior.
+Reason: Pylint expects modules to be documented.
+
+File: moneypoly/dice.py
+Issue: Attribute `doubles_streak` defined outside `__init__` (`attribute-defined-outside-init`)
+Type: Warning (bad design)
+Fix: Initialize `doubles_streak` explicitly in `__init__` before or alongside `reset()`.
+Reason: Defining attributes outside initialization can make object state less predictable.
+
+File: moneypoly/dice.py
+Issue: Unused import `BOARD_SIZE` (`unused-import`)
+Type: Style (PEP8)
+Fix: Remove the unused import.
+Reason: Unused imports add noise and are flagged by pylint.
+
+File: moneypoly/bank.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a module docstring describing bank accounting behavior.
+Reason: Module documentation improves readability and satisfies pylint.
+
+File: moneypoly/bank.py
+Issue: Missing class docstring for `Bank` (`missing-class-docstring`)
+Type: Style (PEP8)
+Fix: Add a class docstring summarizing bank responsibilities.
+Reason: Public classes should be documented clearly.
+
+File: moneypoly/bank.py
+Issue: Unused import `math` (`unused-import`)
+Type: Style (PEP8)
+Fix: Remove the unused import.
+Reason: Unused imports reduce clarity and are flagged by static analysis.
+
+File: moneypoly/player.py
+Issue: Final newline missing (`missing-final-newline`)
+Type: Style (PEP8)
+Fix: Add a trailing newline at the end of the file.
+Reason: Standard text-file formatting expects a final newline.
+
+File: moneypoly/player.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a module-level docstring describing the player model.
+Reason: Pylint expects modules to be documented.
+
+File: moneypoly/player.py
+Issue: Too many instance attributes in `Player` (`too-many-instance-attributes`)
+Type: Warning (bad design)
+Fix: Reduce mutable state or group related player state into smaller structures.
+Reason: High attribute count often indicates an overgrown class design.
+
+File: moneypoly/player.py
+Issue: Unused variable `old_position` (`unused-variable`)
+Type: Style (PEP8)
+Fix: Remove the variable or use it in the movement logic.
+Reason: Unused locals make the code noisier and can indicate incomplete logic.
+
+File: moneypoly/player.py
+Issue: Unused import `sys` (`unused-import`)
+Type: Style (PEP8)
+Fix: Remove the unused import.
+Reason: Unused imports add clutter and are flagged by pylint.
+
+File: tests/test_dummy.py
+Issue: Missing module docstring (`missing-module-docstring`)
+Type: Style (PEP8)
+Fix: Add a short module docstring for the test file.
+Reason: Pylint applies documentation rules to test modules as well.
+
+File: tests/test_dummy.py
+Issue: Missing function or method docstring for `test_pytest_baseline` (`missing-function-docstring`)
+Type: Style (PEP8)
+Fix: Add a short docstring describing the baseline test purpose.
+Reason: Pylint expects documented functions under the current configuration.
