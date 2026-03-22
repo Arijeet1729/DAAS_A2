@@ -21,6 +21,8 @@ class Game:
     """Manages the full state and flow of a MoneyPoly game session."""
 
     def __init__(self, player_names):
+        if len(player_names) < 2:
+            raise ValueError("At least 2 players are required to start the game.")
         self.board = Board()
         self.bank = Bank()
         self.dice = Dice()
@@ -171,8 +173,7 @@ class Game:
         if payout == 0:
             print(f"  {prop.name} is already mortgaged.")
             return False
-        player.add_money(payout)
-        self.bank.collect(-payout)
+        player.add_money(self.bank.pay_out(payout))
         print(f"  {player.name} mortgaged {prop.name} and received ${payout}.")
         return True
 
@@ -327,7 +328,7 @@ class Game:
                 player.add_money(GO_SALARY)
                 print(f"  {player.name} passed Go and collected ${GO_SALARY}.")
             tile = self.board.get_tile_type(value)
-            if tile == "property":
+            if tile in {"property", "railroad"}:
                 prop = self.board.get_property_at(value)
                 if prop:
                     self._handle_property_tile(player, prop)

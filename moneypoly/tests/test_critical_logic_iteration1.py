@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+import pytest
+
 from moneypoly.cards import CardDeck
 from moneypoly.dice import Dice
 from moneypoly.game import Game
@@ -127,3 +129,48 @@ def test_voluntary_jail_fine_deducts_player_balance():
 
     assert player.balance == 1450
     move_and_resolve.assert_called_once_with(player, 2)
+
+
+def test_game_requires_at_least_two_players():
+    with pytest.raises(ValueError):
+        Game(["Solo"])
+
+
+def test_bank_loan_reduces_bank_funds():
+    game = Game(["Alice", "Bob"])
+    player = game.players[0]
+    before = game.bank.get_balance()
+
+    game.bank.give_loan(player, 200)
+
+    assert player.balance == 1700
+    assert game.bank.get_balance() == before - 200
+
+
+def test_railroad_tiles_have_properties():
+    game = Game(["Alice", "Bob"])
+
+    assert game.board.get_property_at(5) is not None
+    assert game.board.get_property_at(15) is not None
+    assert game.board.get_property_at(25) is not None
+    assert game.board.get_property_at(35) is not None
+
+
+def test_move_to_card_resolves_railroad_property():
+    game = Game(["Alice", "Bob"])
+    player = game.players[0]
+    player.position = 4
+    railroad = game.board.get_property_at(5)
+
+    with patch.object(game, "_handle_property_tile") as handle_property_tile:
+        game._apply_card(player, {"description": "Move", "action": "move_to", "value": 5})
+
+    assert player.position == 5
+    handle_property_tile.assert_called_once_with(player, railroad)
+
+
+def test_net_worth_includes_property_values():
+    player = Player("Alice", balance=100)
+    player.add_property(Property("Test Avenue", 1, 200, 10))
+
+    assert player.net_worth() == 300
