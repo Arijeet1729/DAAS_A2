@@ -2718,3 +2718,92 @@ Request:
   Body: None
 Expected Response: 401 Unauthorized
 Why this test is important: Confirms missing-header handling for the admin addresses endpoint.
+
+Module: tests/test_cart.py
+Test Case ID: CRT-PY-001
+Endpoint: POST /api/v1/cart/update
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/cart/update
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"product_id":1,"quantity":3}
+Expected Response: 200 OK and the cart item quantity updates to 3
+Why this test is important: Verifies the main cart-update flow and confirms the updated quantity is reflected in cart state.
+
+Test Case ID: CRT-PY-002
+Endpoint: POST /api/v1/cart/update
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/cart/update
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"product_id":1,"quantity":0}
+Expected Response: 400 Bad Request
+Why this test is important: Confirms quantities below 1 are rejected during cart updates.
+
+Test Case ID: CRT-PY-003
+Endpoint: POST /api/v1/cart/remove
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/cart/remove
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"product_id":1}
+Expected Response: 200 OK and the cart item is removed
+Why this test is important: Verifies the successful remove path and confirms the item no longer appears in the cart.
+
+Test Case ID: CRT-PY-004
+Endpoint: POST /api/v1/cart/remove
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/cart/remove
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"product_id":999999}
+Expected Response: 404 Not Found
+Why this test is important: Confirms removal of a non-existent cart item is rejected.
+
+Test Case ID: CRT-PY-005
+Endpoint: POST /api/v1/cart/add
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/cart/add
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: First {"product_id":1,"quantity":1}, then {"product_id":1,"quantity":2}
+Expected Response: Final cart quantity for product 1 becomes 3
+Why this test is important: Verifies duplicate adds accumulate quantity instead of replacing it.
+
+Test Case ID: CRT-PY-006
+Endpoint: POST /api/v1/cart/add
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/cart/add
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"product_id":1,"quantity":183}
+Expected Response: 400 Bad Request because the request exceeds available stock
+Why this test is important: Confirms stock limits are enforced using a realistic live-stock boundary.
+
+Test Case ID: CRT-PY-007
+Endpoint: DELETE /api/v1/cart/clear
+Type: Valid
+Request:
+  Method: DELETE
+  URL: /api/v1/cart/clear
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 200 OK and a subsequent cart read returns an empty items list with total 0
+Why this test is important: Verifies the clear-cart operation changes stored cart state, not just the immediate response message.
+
+Test Case ID: CRT-PY-008
+Endpoint: GET /api/v1/cart
+Type: Edge
+Request:
+  Method: GET
+  URL: /api/v1/cart
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: Cart prepared with multiple items, including a last item added separately
+Expected Response: total equals the sum of all returned subtotals, including the last item
+Why this test is important: Verifies cart-total aggregation does not miss the last element in the items list.
