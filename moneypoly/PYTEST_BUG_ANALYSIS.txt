@@ -1,0 +1,35 @@
+Test Failed: `tests/test_bank.py::test_collect_ignores_negative_amounts_per_docstring`
+Reason: `Bank.collect()` subtracts from bank funds when given a negative amount, even though its docstring says negative values should be silently ignored.
+Bug Location: `moneypoly/bank.py`, function `collect`
+Fix Suggestion: Add an early return for `amount < 0` or explicitly reject negative amounts before mutating `_funds` and `_total_collected`.
+Commit: `Error 1: Identified bug in Bank.collect`
+
+Test Failed: `tests/test_game.py::test_buy_property_rejects_property_that_is_already_owned`
+Reason: `Game.buy_property()` checks only affordability and unconditionally assigns ownership, so it allows direct purchase of a property that already belongs to another player.
+Bug Location: `moneypoly/game.py`, function `buy_property`
+Fix Suggestion: Validate that `prop.owner is None` before completing the purchase, and return `False` if the property is already owned.
+Commit: `Error 2: Identified bug in Game.buy_property`
+
+Test Failed: `tests/test_game.py::test_apply_card_move_to_special_tile_resolves_tile_effect`
+Reason: `_apply_move_to_card()` updates the player position and only resolves property or railroad tiles, so landing on a special tile like luxury tax does not trigger that tile's effect.
+Bug Location: `moneypoly/game.py`, function `_apply_move_to_card`
+Fix Suggestion: Reuse the normal board-resolution flow after movement or add explicit handling for tax, jail, chest, chance, and other special tiles reached via cards.
+Commit: `Error 3: Identified bug in Game._apply_move_to_card`
+
+Test Failed: `tests/test_game.py::test_check_bankruptcy_preserves_current_player_after_earlier_player_removed`
+Reason: `_check_bankruptcy()` removes a bankrupt player from `self.players` without adjusting `current_index` when the removed player appears before the current player, so turn order shifts incorrectly.
+Bug Location: `moneypoly/game.py`, function `_check_bankruptcy`
+Fix Suggestion: Decrement `current_index` when a removed player had an index lower than the current player, then apply the existing out-of-range guard.
+Commit: `Error 4: Identified bug in Game._check_bankruptcy`
+
+Test Failed: `tests/test_game.py::test_trade_rejects_negative_cash_amount`
+Reason: `Game.trade()` accepts negative `cash_amount` values until `buyer.deduct_money()` raises `ValueError`, so invalid trade input is not validated at the game layer.
+Bug Location: `moneypoly/game.py`, function `trade`
+Fix Suggestion: Reject `cash_amount < 0` at the start of the function and return `False` without attempting any balance mutation.
+Commit: `Error 5: Identified bug in Game.trade`
+
+Test Failed: `tests/test_game.py::test_auction_property_allows_additional_rounds_after_outbid`
+Reason: `Game.auction_property()` performs only a single pass across players and awards the property to the highest bidder immediately, so previously outbid players never get another chance to respond.
+Bug Location: `moneypoly/game.py`, function `auction_property`
+Fix Suggestion: Implement repeated bidding rounds until all but one player pass, or otherwise track active bidders and continue the auction until it reaches a stable winner.
+Commit: `Error 6: Identified bug in Game.auction_property`
