@@ -2505,3 +2505,94 @@ Request:
   Body: {"status":"IN_PROGRESS"}
 Expected Response: 404 Not Found or 400 Bad Request
 Why this test is important: Exercises the lower ticket-ID boundary.
+
+Implemented Pytest Test Cases
+
+Module: tests/test_loyalty.py
+Test Case ID: LOY-PY-001
+Endpoint: GET /api/v1/loyalty
+Type: Valid
+Request:
+  Method: GET
+  URL: /api/v1/loyalty
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 200 OK with JSON containing loyalty_points
+Why this test is important: Verifies the endpoint is reachable and returns the expected JSON structure for loyalty balance retrieval.
+
+Test Case ID: LOY-PY-002
+Endpoint: POST /api/v1/loyalty/redeem
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/loyalty/redeem
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"amount":1}
+Expected Response: 200 OK and loyalty points reduced by 1
+Why this test is important: Verifies the minimum valid redeem flow defined by the specification.
+
+Test Case ID: LOY-PY-003
+Endpoint: POST /api/v1/loyalty/redeem
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/loyalty/redeem
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"amount": current_points + 1}
+Expected Response: 400 Bad Request
+Why this test is important: Confirms the API rejects redemption requests that exceed the available loyalty balance.
+
+Test Case ID: LOY-PY-004
+Endpoint: POST /api/v1/loyalty/redeem
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/loyalty/redeem
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"amount":0}
+Expected Response: 400 Bad Request
+Why this test is important: Verifies the zero boundary is rejected for redemption.
+
+Test Case ID: LOY-PY-005
+Endpoint: POST /api/v1/loyalty/redeem
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/loyalty/redeem
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"amount":-5}
+Expected Response: 400 Bad Request
+Why this test is important: Confirms negative redemption values are rejected.
+
+Test Case ID: LOY-PY-006
+Endpoint: GET /api/v1/loyalty
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/loyalty
+  Headers: X-User-ID: 1
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Verifies missing X-Roll-Number handling on the loyalty read endpoint.
+
+Test Case ID: LOY-PY-007
+Endpoint: GET /api/v1/loyalty
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/loyalty
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 400 Bad Request
+Why this test is important: Verifies missing X-User-ID handling on the loyalty read endpoint.
+
+Test Case ID: LOY-PY-008
+Endpoint: POST /api/v1/loyalty/redeem
+Type: Edge
+Request:
+  Method: POST
+  URL: /api/v1/loyalty/redeem
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"amount":2}
+Expected Response: 200 OK and loyalty points reduced exactly by 2
+Why this test is important: Verifies the correctness of state change after redemption, not just the status code.
