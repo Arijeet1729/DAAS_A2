@@ -2596,3 +2596,125 @@ Request:
   Body: {"amount":2}
 Expected Response: 200 OK and loyalty points reduced exactly by 2
 Why this test is important: Verifies the correctness of state change after redemption, not just the status code.
+
+Module: tests/test_admin.py
+Test Case ID: ADM-PY-001
+Endpoint: GET /api/v1/admin/users/{user_id}
+Type: Valid
+Request:
+  Method: GET
+  URL: /api/v1/admin/users/1
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 200 OK with a user object containing user_id, name, email, wallet_balance, and loyalty_points
+Why this test is important: Verifies successful access to a single admin user record and confirms object JSON structure.
+
+Test Case ID: ADM-PY-002
+Endpoint: GET /api/v1/admin/users/{user_id}
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/admin/users/1
+  Headers: None
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms the admin user-detail endpoint still requires the X-Roll-Number header.
+
+Test Case ID: ADM-PY-003
+Endpoint: GET /api/v1/admin/users/{user_id}
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/admin/users/999999
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 404 Not Found
+Why this test is important: Confirms invalid admin user identifiers are handled correctly.
+
+Test Case ID: ADM-PY-004
+Endpoint: GET /api/v1/admin/carts
+Type: Valid
+Request:
+  Method: GET
+  URL: /api/v1/admin/carts
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 200 OK with a list of cart objects containing cart_id, user_id, items, and total
+Why this test is important: Verifies admin cart inspection is working and returns the expected list structure.
+
+Test Case ID: ADM-PY-005
+Endpoint: GET /api/v1/admin/carts
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/admin/carts
+  Headers: None
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms missing-header handling for the admin carts endpoint.
+
+Test Case ID: ADM-PY-006
+Endpoint: GET /api/v1/admin/coupons
+Type: Valid
+Request:
+  Method: GET
+  URL: /api/v1/admin/coupons
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 200 OK with a list of coupon objects containing coupon_code, discount_type, discount_value, min_cart_value, max_discount, and expiry_date
+Why this test is important: Verifies the admin coupons endpoint responds and returns the expected JSON fields.
+
+Test Case ID: ADM-PY-007
+Endpoint: GET /api/v1/admin/coupons
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/admin/coupons
+  Headers: None
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms missing-header handling for the admin coupons endpoint.
+
+Test Case ID: ADM-PY-008
+Endpoint: GET /api/v1/admin/tickets
+Type: Valid
+Request:
+  Method: GET
+  URL: /api/v1/admin/tickets
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 200 OK with a list of ticket objects containing ticket_id, user_id, status, subject, and message
+Why this test is important: Verifies support-ticket inspection at the admin level and validates response structure.
+
+Test Case ID: ADM-PY-009
+Endpoint: GET /api/v1/admin/tickets
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/admin/tickets
+  Headers: None
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms missing-header handling for the admin tickets endpoint.
+
+Test Case ID: ADM-PY-010
+Endpoint: GET /api/v1/admin/addresses
+Type: Valid
+Request:
+  Method: GET
+  URL: /api/v1/admin/addresses
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 200 OK with a list of address objects containing address_id, user_id, label, street, city, pincode, and is_default
+Why this test is important: Verifies address inspection works at the admin level and validates the returned JSON structure.
+
+Test Case ID: ADM-PY-011
+Endpoint: GET /api/v1/admin/addresses
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/admin/addresses
+  Headers: None
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms missing-header handling for the admin addresses endpoint.
