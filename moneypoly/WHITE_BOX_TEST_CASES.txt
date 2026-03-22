@@ -1,0 +1,265 @@
+Test Case ID: TC-P-001
+Function: Player.add_money
+Scenario: Add a valid positive amount to player balance
+Input: Player balance = 1000, amount = 200
+Expected Output: Balance becomes 1200, no exception raised
+Why needed (IMPORTANT): Covers the normal false branch of `amount < 0` and confirms successful state update.
+
+Test Case ID: TC-P-002
+Function: Player.add_money
+Scenario: Add zero amount
+Input: Player balance = 1000, amount = 0
+Expected Output: Balance remains 1000, no exception raised
+Why needed (IMPORTANT): Covers the edge value at the lower valid boundary and confirms zero is accepted.
+
+Test Case ID: TC-P-003
+Function: Player.add_money
+Scenario: Add a negative amount
+Input: Player balance = 1000, amount = -1
+Expected Output: `ValueError` is raised, balance remains unchanged
+Why needed (IMPORTANT): Covers the true branch of `amount < 0` and validates input protection.
+
+Test Case ID: TC-P-004
+Function: Player.deduct_money
+Scenario: Deduct a valid positive amount from player balance
+Input: Player balance = 1000, amount = 200
+Expected Output: Balance becomes 800, no exception raised
+Why needed (IMPORTANT): Covers the normal false branch of `amount < 0` and confirms successful state update.
+
+Test Case ID: TC-P-005
+Function: Player.deduct_money
+Scenario: Deduct zero amount
+Input: Player balance = 1000, amount = 0
+Expected Output: Balance remains 1000, no exception raised
+Why needed (IMPORTANT): Covers the valid boundary case and confirms no unintended mutation.
+
+Test Case ID: TC-P-006
+Function: Player.deduct_money
+Scenario: Deduct a negative amount
+Input: Player balance = 1000, amount = -1
+Expected Output: `ValueError` is raised, balance remains unchanged
+Why needed (IMPORTANT): Covers the true branch of `amount < 0` and validates defensive behavior.
+
+Test Case ID: TC-P-007
+Function: Player.move
+Scenario: Move without passing Go
+Input: Player position = 5, balance = 1000, steps = 6
+Expected Output: New position = 11, balance remains 1000
+Why needed (IMPORTANT): Covers the false branch of pass-Go detection and confirms ordinary movement.
+
+Test Case ID: TC-P-008
+Function: Player.move
+Scenario: Land exactly on Go
+Input: Player position = 38, balance = 1000, steps = 2
+Expected Output: New position = 0, balance becomes 1200
+Why needed (IMPORTANT): Covers the wraparound case where the player lands exactly on Go and should collect salary.
+
+Test Case ID: TC-P-009
+Function: Player.move
+Scenario: Pass Go without landing on it
+Input: Player position = 39, balance = 1000, steps = 2
+Expected Output: New position = 1, balance becomes 1200
+Why needed (IMPORTANT): Covers the wraparound edge case where salary must still be awarded after passing Go.
+
+Test Case ID: TC-B-001
+Function: Bank.pay_out
+Scenario: Pay out a valid amount within available funds
+Input: Bank funds = 20580, amount = 500
+Expected Output: Return value = 500, bank funds decrease by 500
+Why needed (IMPORTANT): Covers the normal false branches of both checks and validates successful payout behavior.
+
+Test Case ID: TC-B-002
+Function: Bank.pay_out
+Scenario: Pay out zero amount
+Input: Bank funds = 20580, amount = 0
+Expected Output: Return value = 0, bank funds remain unchanged
+Why needed (IMPORTANT): Covers the true branch of `amount <= 0` at the boundary value.
+
+Test Case ID: TC-B-003
+Function: Bank.pay_out
+Scenario: Pay out negative amount
+Input: Bank funds = 20580, amount = -10
+Expected Output: Return value = 0, bank funds remain unchanged
+Why needed (IMPORTANT): Covers the true branch of `amount <= 0` with an invalid negative input.
+
+Test Case ID: TC-B-004
+Function: Bank.pay_out
+Scenario: Pay out more than bank funds
+Input: Bank funds = 20580, amount = 30000
+Expected Output: `ValueError` is raised, bank funds remain unchanged
+Why needed (IMPORTANT): Covers the true branch of `amount > self._funds` and validates insufficient-funds handling.
+
+Test Case ID: TC-BO-001
+Function: Board.is_purchasable
+Scenario: Position has no property
+Input: Position = 0
+Expected Output: Return value = False
+Why needed (IMPORTANT): Covers the true branch of `prop is None` for non-purchasable board tiles.
+
+Test Case ID: TC-BO-002
+Function: Board.is_purchasable
+Scenario: Position has a mortgaged property
+Input: Property at position 1 with `is_mortgaged = True`, owner = existing player
+Expected Output: Return value = False
+Why needed (IMPORTANT): Covers the true branch of `prop.is_mortgaged`.
+
+Test Case ID: TC-BO-003
+Function: Board.is_purchasable
+Scenario: Position has an unowned, unmortgaged property
+Input: Property at position 1 with `owner = None`, `is_mortgaged = False`
+Expected Output: Return value = True
+Why needed (IMPORTANT): Covers the successful false branches and validates the only purchasable state.
+
+Test Case ID: TC-BO-004
+Function: Board.is_purchasable
+Scenario: Position has an owned, unmortgaged property
+Input: Property at position 1 with `owner = Player("Alice")`, `is_mortgaged = False`
+Expected Output: Return value = False
+Why needed (IMPORTANT): Covers the final return branch where ownership blocks purchase.
+
+Test Case ID: TC-G-001
+Function: Game.buy_property
+Scenario: Player can afford property with more than enough balance
+Input: Player balance = 500, property price = 100, property owner = None
+Expected Output: Return value = True, player balance = 400, property owner becomes player, property added to holdings
+Why needed (IMPORTANT): Covers the normal false branch of the affordability check and validates all related state changes.
+
+Test Case ID: TC-G-002
+Function: Game.buy_property
+Scenario: Player can afford property with exact balance
+Input: Player balance = 100, property price = 100, property owner = None
+Expected Output: Return value = True, player balance = 0, property owner becomes player
+Why needed (IMPORTANT): Covers the affordability boundary and prevents regression on exact-balance purchase logic.
+
+Test Case ID: TC-G-003
+Function: Game.buy_property
+Scenario: Player cannot afford property
+Input: Player balance = 99, property price = 100, property owner = None
+Expected Output: Return value = False, player balance unchanged, property remains unowned
+Why needed (IMPORTANT): Covers the true branch of `player.balance < prop.price`.
+
+Test Case ID: TC-G-004
+Function: Game.pay_rent
+Scenario: Property is mortgaged
+Input: Tenant balance = 1500, owner balance = 1500, property rent = 25, `is_mortgaged = True`
+Expected Output: No balance changes, function returns without payment
+Why needed (IMPORTANT): Covers the early return true branch for mortgaged properties.
+
+Test Case ID: TC-G-005
+Function: Game.pay_rent
+Scenario: Property has no owner
+Input: Tenant balance = 1500, property owner = None, `is_mortgaged = False`
+Expected Output: No balance changes, function returns without payment
+Why needed (IMPORTANT): Covers the true branch of `prop.owner is None`.
+
+Test Case ID: TC-G-006
+Function: Game.pay_rent
+Scenario: Normal rent payment to owner
+Input: Tenant balance = 1500, owner balance = 1500, property rent = 25, owner assigned, `is_mortgaged = False`
+Expected Output: Tenant balance = 1475, owner balance = 1525
+Why needed (IMPORTANT): Covers the full payment branch and verifies both debit and credit state transitions.
+
+Test Case ID: TC-G-007
+Function: Game._apply_card
+Scenario: Card is `None`
+Input: `card = None`
+Expected Output: Function returns immediately, no player or bank state changes
+Why needed (IMPORTANT): Covers the first guard clause and confirms safe handling of empty decks.
+
+Test Case ID: TC-G-008
+Function: Game._apply_card
+Scenario: Collect card
+Input: Player balance = 1500, bank funds = 20580, `card = {"action": "collect", "value": 50, ...}`
+Expected Output: Player balance = 1550, bank funds decrease by 50
+Why needed (IMPORTANT): Covers the `action == "collect"` branch and validates money flow from bank to player.
+
+Test Case ID: TC-G-009
+Function: Game._apply_card
+Scenario: Pay card
+Input: Player balance = 1500, bank funds = 20580, `card = {"action": "pay", "value": 50, ...}`
+Expected Output: Player balance = 1450, bank funds increase by 50
+Why needed (IMPORTANT): Covers the `action == "pay"` branch and validates money flow from player to bank.
+
+Test Case ID: TC-G-010
+Function: Game._apply_card
+Scenario: Jail card
+Input: Player position = 7, in_jail = False, `card = {"action": "jail", "value": 0, ...}`
+Expected Output: Player moves to jail position, `in_jail = True`
+Why needed (IMPORTANT): Covers the `action == "jail"` branch and validates state transition into jail.
+
+Test Case ID: TC-G-011
+Function: Game._apply_card
+Scenario: Jail-free card
+Input: Player jail-free cards = 0, `card = {"action": "jail_free", "value": 0, ...}`
+Expected Output: Player jail-free cards becomes 1
+Why needed (IMPORTANT): Covers the `action == "jail_free"` branch and validates inventory state update.
+
+Test Case ID: TC-G-012
+Function: Game._apply_card
+Scenario: Move-to card without passing Go onto a normal property
+Input: Player position = 5, `card = {"action": "move_to", "value": 6, ...}`, property at 6 exists
+Expected Output: Player position becomes 6, no Go salary, property handling is triggered
+Why needed (IMPORTANT): Covers the `move_to` branch with false branch of `value < old_pos` and the true branch of property handling.
+
+Test Case ID: TC-G-013
+Function: Game._apply_card
+Scenario: Move-to card that passes Go onto a railroad
+Input: Player position = 39, `card = {"action": "move_to", "value": 5, ...}`, railroad at 5 exists
+Expected Output: Player position becomes 5, Go salary added, property handling is triggered for railroad
+Why needed (IMPORTANT): Covers the true branch of `value < old_pos` and the railroad resolution path.
+
+Test Case ID: TC-G-014
+Function: Game._apply_card
+Scenario: Birthday card where all other players can pay
+Input: Three players with balances >= 10, `card = {"action": "birthday", "value": 10, ...}`
+Expected Output: Current player gains 20 total, each other player loses 10
+Why needed (IMPORTANT): Covers the `birthday` loop branch where transfer condition is true.
+
+Test Case ID: TC-G-015
+Function: Game._apply_card
+Scenario: Birthday card where one other player cannot pay
+Input: Three players, one other balance = 5, one other balance = 20, `card = {"action": "birthday", "value": 10, ...}`
+Expected Output: Only the player with sufficient funds pays; low-balance player is unchanged
+Why needed (IMPORTANT): Covers the false branch inside the birthday transfer condition.
+
+Test Case ID: TC-G-016
+Function: Game._apply_card
+Scenario: Collect-from-all card with mixed payer balances
+Input: Three players, one other balance = 50, one other balance = 30, `card = {"action": "collect_from_all", "value": 50, ...}`
+Expected Output: Only the player with 50 pays; the player with 30 does not
+Why needed (IMPORTANT): Covers the `collect_from_all` branch and the internal true/false transfer conditions.
+
+Test Case ID: TC-G-017
+Function: Game._apply_card
+Scenario: Unrecognized card action
+Input: `card = {"action": "unknown", "value": 0, ...}`
+Expected Output: Function completes with no state changes
+Why needed (IMPORTANT): Covers the implicit no-op path when no action branch matches.
+
+Test Case ID: TC-G-018
+Function: Game._check_bankruptcy
+Scenario: Player is not bankrupt
+Input: Player balance = 1, owned properties list non-empty
+Expected Output: Player remains active, players list unchanged, properties unchanged
+Why needed (IMPORTANT): Covers the false branch of `player.is_bankrupt()`.
+
+Test Case ID: TC-G-019
+Function: Game._check_bankruptcy
+Scenario: Player becomes bankrupt with owned properties
+Input: Player balance = 0, player owns one or more properties, player is present in `self.players`
+Expected Output: Player marked eliminated, removed from players list, owned properties become unowned and unmortgaged
+Why needed (IMPORTANT): Covers the true branch of bankruptcy handling and validates all cleanup side effects.
+
+Test Case ID: TC-G-020
+Function: Game._check_bankruptcy
+Scenario: Bankrupt player is the last index in player rotation
+Input: `current_index` points to final player in list, that player balance = 0
+Expected Output: Player removed and `current_index` resets to 0
+Why needed (IMPORTANT): Covers the true branch of `self.current_index >= len(self.players)` after removal.
+
+Test Case ID: TC-G-021
+Function: Game._check_bankruptcy
+Scenario: Bankrupt player was already absent from players list
+Input: Player balance = 0, player not present in `self.players`
+Expected Output: No removal error occurs, cleanup still completes safely
+Why needed (IMPORTANT): Covers the false branch of `if player in self.players` and validates defensive behavior.
