@@ -2807,3 +2807,181 @@ Request:
   Body: Cart prepared with multiple items, including a last item added separately
 Expected Response: total equals the sum of all returned subtotals, including the last item
 Why this test is important: Verifies cart-total aggregation does not miss the last element in the items list.
+
+Module: tests/test_checkout.py
+Test Case ID: CHK-PY-001
+Endpoint: POST /api/v1/checkout
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/checkout
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"payment_method":"COD"} with cart total <= 5000
+Expected Response: 200 OK and payment_status PENDING
+Why this test is important: Verifies successful COD checkout on the documented allowed side of the monetary boundary.
+
+Test Case ID: CHK-PY-002
+Endpoint: POST /api/v1/checkout
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/checkout
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"payment_method":"WALLET"}
+Expected Response: 200 OK and payment_status PENDING
+Why this test is important: Verifies the documented payment-status behavior for successful wallet checkout.
+
+Test Case ID: CHK-PY-003
+Endpoint: POST /api/v1/checkout
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/checkout
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"payment_method":"CARD"}
+Expected Response: 200 OK and payment_status PAID
+Why this test is important: Verifies the documented payment-status behavior for card checkout.
+
+Test Case ID: CHK-PY-004
+Endpoint: POST /api/v1/checkout
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/checkout
+  Headers: X-User-ID: 1, Content-Type: application/json
+  Body: {"payment_method":"CARD"}
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms missing X-Roll-Number handling for checkout.
+
+Test Case ID: CHK-PY-005
+Endpoint: POST /api/v1/checkout
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/checkout
+  Headers: X-Roll-Number: 123, Content-Type: application/json
+  Body: {"payment_method":"CARD"}
+Expected Response: 400 Bad Request
+Why this test is important: Confirms missing X-User-ID handling for checkout.
+
+Module: tests/test_orders.py
+Test Case ID: ORD-PY-001
+Endpoint: POST /api/v1/orders/{order_id}/cancel
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/orders/{created_order_id}/cancel
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 200 OK and the associated product stock is restored
+Why this test is important: Verifies both successful cancellation and the documented stock-restoration side effect.
+
+Test Case ID: ORD-PY-002
+Endpoint: POST /api/v1/orders/{order_id}/cancel
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/orders/2038/cancel
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 400 Bad Request
+Why this test is important: Confirms delivered orders cannot be cancelled.
+
+Test Case ID: ORD-PY-003
+Endpoint: GET /api/v1/orders/{order_id}/invoice
+Type: Edge
+Request:
+  Method: GET
+  URL: /api/v1/orders/{order_id}/invoice
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 200 OK and subtotal + gst_amount equals total_amount exactly
+Why this test is important: Verifies invoice arithmetic correctness using returned response values.
+
+Test Case ID: ORD-PY-004
+Endpoint: GET /api/v1/orders/{order_id}
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/orders/999999
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 404 Not Found
+Why this test is important: Confirms invalid order identifiers are rejected on detail retrieval.
+
+Test Case ID: ORD-PY-005
+Endpoint: GET /api/v1/orders/{order_id}/invoice
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/orders/999999/invoice
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 404 Not Found
+Why this test is important: Confirms invalid order identifiers are rejected on invoice retrieval.
+
+Test Case ID: ORD-PY-006
+Endpoint: POST /api/v1/orders/{order_id}/cancel
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/orders/1209/cancel
+  Headers: X-User-ID: 1
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms missing X-Roll-Number handling for cancellation.
+
+Test Case ID: ORD-PY-007
+Endpoint: POST /api/v1/orders/{order_id}/cancel
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/orders/1209/cancel
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 400 Bad Request
+Why this test is important: Confirms missing X-User-ID handling for cancellation.
+
+Test Case ID: ORD-PY-008
+Endpoint: GET /api/v1/orders/{order_id}
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/orders/1209
+  Headers: X-User-ID: 1
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms missing X-Roll-Number handling for order-detail retrieval.
+
+Test Case ID: ORD-PY-009
+Endpoint: GET /api/v1/orders/{order_id}
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/orders/1209
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 400 Bad Request
+Why this test is important: Confirms missing X-User-ID handling for order-detail retrieval.
+
+Test Case ID: ORD-PY-010
+Endpoint: GET /api/v1/orders/{order_id}/invoice
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/orders/1209/invoice
+  Headers: X-User-ID: 1
+  Body: None
+Expected Response: 401 Unauthorized
+Why this test is important: Confirms missing X-Roll-Number handling for invoice retrieval.
+
+Test Case ID: ORD-PY-011
+Endpoint: GET /api/v1/orders/{order_id}/invoice
+Type: Invalid
+Request:
+  Method: GET
+  URL: /api/v1/orders/1209/invoice
+  Headers: X-Roll-Number: 123
+  Body: None
+Expected Response: 400 Bad Request
+Why this test is important: Confirms missing X-User-ID handling for invoice retrieval.

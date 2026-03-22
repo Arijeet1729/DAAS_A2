@@ -24,6 +24,27 @@ def test_checkout_with_card_returns_order_payload(clean_cart):
     assert payload["payment_status"] == "PAID"
 
 
+def test_checkout_with_cod_success_returns_pending_status(clean_cart):
+    requests.post(
+        f"{BASE_URL}/cart/add",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"product_id": 1, "quantity": 1},
+        timeout=TIMEOUT,
+    )
+
+    response = requests.post(
+        f"{BASE_URL}/checkout",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"payment_method": "COD"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert_keys(payload, ["gst_amount", "order_id", "order_status", "payment_status", "total_amount"])
+    assert payload["payment_status"] == "PENDING"
+
+
 def test_checkout_with_empty_cart_returns_400(clean_cart):
     response = requests.post(
         f"{BASE_URL}/checkout",
@@ -60,6 +81,57 @@ def test_checkout_with_cod_over_5000_returns_400(clean_cart):
         f"{BASE_URL}/checkout",
         headers=request_headers(1, {"Content-Type": "application/json"}),
         json={"payment_method": "COD"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+def test_checkout_with_wallet_success_returns_pending_status(clean_cart):
+    requests.post(
+        f"{BASE_URL}/wallet/add",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"amount": 200},
+        timeout=TIMEOUT,
+    )
+    requests.post(
+        f"{BASE_URL}/cart/add",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"product_id": 1, "quantity": 1},
+        timeout=TIMEOUT,
+    )
+
+    response = requests.post(
+        f"{BASE_URL}/checkout",
+        headers=request_headers(1, {"Content-Type": "application/json"}),
+        json={"payment_method": "WALLET"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert_keys(payload, ["gst_amount", "order_id", "order_status", "payment_status", "total_amount"])
+    assert payload["payment_status"] == "PENDING"
+
+
+def test_checkout_without_roll_number_returns_401(clean_cart):
+    response = requests.post(
+        f"{BASE_URL}/checkout",
+        headers={"X-User-ID": "1", "Content-Type": "application/json"},
+        json={"payment_method": "CARD"},
+        timeout=TIMEOUT,
+    )
+
+    assert response.status_code == 401
+    assert "error" in response.json()
+
+
+def test_checkout_without_user_id_returns_400(clean_cart):
+    response = requests.post(
+        f"{BASE_URL}/checkout",
+        headers={"X-Roll-Number": "123", "Content-Type": "application/json"},
+        json={"payment_method": "CARD"},
         timeout=TIMEOUT,
     )
 
