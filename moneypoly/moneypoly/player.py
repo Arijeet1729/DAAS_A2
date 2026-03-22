@@ -45,7 +45,7 @@ class Player:
         old_position = self.position
         self.position = (self.position + steps) % BOARD_SIZE
 
-        if self.position == 0:
+        if old_position + steps >= BOARD_SIZE:
             self.add_money(GO_SALARY)
             print(f"  {self.name} landed on Go and collected ${GO_SALARY}.")
 
