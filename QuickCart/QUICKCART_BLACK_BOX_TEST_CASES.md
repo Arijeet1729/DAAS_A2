@@ -2985,3 +2985,59 @@ Request:
   Body: None
 Expected Response: 400 Bad Request
 Why this test is important: Confirms missing X-User-ID handling for invoice retrieval.
+
+Module: tests/test_coupon.py
+Test Case ID: CPN-PY-001
+Endpoint: POST /api/v1/coupon/apply
+Type: Invalid
+Request:
+  Method: POST
+  URL: /api/v1/coupon/apply
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"coupon_code":"SAVE200"} with cart total below the coupon minimum
+Expected Response: 400 Bad Request
+Why this test is important: Confirms minimum cart value requirements are enforced before discount application.
+
+Test Case ID: CPN-PY-002
+Endpoint: POST /api/v1/coupon/apply
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/coupon/apply
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"coupon_code":"WELCOME50"}
+Expected Response: 200 OK with discount 50 and new_total 70 for a cart containing one product priced at 120
+Why this test is important: Verifies fixed coupon arithmetic on a simple deterministic cart.
+
+Test Case ID: CPN-PY-003
+Endpoint: POST /api/v1/coupon/apply
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/coupon/apply
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"coupon_code":"PERCENT10"}
+Expected Response: 200 OK with discount 50 and new_total 450 for a cart subtotal of 500
+Why this test is important: Verifies percentage coupon arithmetic on a deterministic cart subtotal.
+
+Test Case ID: CPN-PY-004
+Endpoint: POST /api/v1/coupon/apply
+Type: Edge
+Request:
+  Method: POST
+  URL: /api/v1/coupon/apply
+  Headers: X-Roll-Number: 123, X-User-ID: 1, Content-Type: application/json
+  Body: {"coupon_code":"PERCENT30"} on a cart subtotal where the raw 30 percent discount exceeds the documented cap
+Expected Response: 200 OK with discount capped at 300
+Why this test is important: Verifies discount cap enforcement for percent coupons.
+
+Test Case ID: CPN-PY-005
+Endpoint: POST /api/v1/coupon/remove
+Type: Valid
+Request:
+  Method: POST
+  URL: /api/v1/coupon/remove
+  Headers: X-Roll-Number: 123, X-User-ID: 1
+  Body: None
+Expected Response: 200 OK and cart total restored to its original pre-coupon value
+Why this test is important: Verifies coupon removal restores cart pricing state, not just returns a success message.
