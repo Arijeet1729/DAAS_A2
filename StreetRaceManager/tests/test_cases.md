@@ -15,6 +15,14 @@ Environment: Python 3.14, virtualenv `.venv`, pytest 9.0.2.
   Expectation (logical): duplicate registrations should be rejected.  
   Actual run (pytest -q tests/unit/test_registration.py): **Failed** — duplicates are allowed (intentional bug), assertion `len(duplicates) == 1` fails because two entries are present.
 
+- `test_assign_role_to_registered_user`  
+  Expectation: assigning a role to an existing user stores and retrieves the role.  
+  Result: **Pass** (`pytest -q tests/unit/test_crew.py`).
+
+- `test_assign_role_to_unregistered_user_should_fail`  
+  Expectation (logical): assigning a role to an unregistered user should fail.  
+  Actual: **Failed** — role is stored for unregistered user (intentional bug), assertion `get_role('Kai') is None` fails because value is `"Mechanic"`.
+
 ## Notes / Issues Encountered
 - Initial `pytest` invocation without setting the working directory tried to collect sibling project tests (`QuickCart`, `moneypoly`) and failed due to missing `requests`. Running from the project root avoids this.
 - Pytest’s built-in debugging plugin imports the stdlib `code` module; our package name `code` shadowed it, causing an `AttributeError` during configuration. Added `addopts = -p no:debugging` in `pytest.ini` to skip that plugin.
