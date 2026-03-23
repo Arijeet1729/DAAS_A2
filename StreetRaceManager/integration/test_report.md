@@ -14,10 +14,6 @@ The following scenarios test critical workflows such as:
 Each test case highlights discrepancies between expected system behavior and actual behavior, thereby exposing logical flaws in the implementation.
 
 
-## Test Outcomes
-- Expected to pass ideally: IT-01, IT-12, IT-13, IT-15, IT-16  
-- Expected to fail (known bugs): IT-02–IT-11, IT-14, IT-17–IT-30
-
 ## Scenarios (condensed)
 
 IT-01: Register, assign Driver, enter race  
