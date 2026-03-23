@@ -71,6 +71,22 @@ Environment: Python 3.14, virtualenv `.venv`, pytest 9.0.2.
   Expectation: repairs increase health without exceeding 100.  
   Result: **Pass**.
 
+- `test_record_win`  
+  Expectation: recording a win increments count.  
+  Result: **Pass** (`pytest -q tests/unit/test_ranking.py`).
+
+- `test_multiple_wins`  
+  Expectation: repeated wins accumulate correctly.  
+  Result: **Pass**.
+
+- `test_ranking_order`  
+  Expectation (logical): highest wins first.  
+  Actual: **Failed** — rankings sorted ascending, so top winner appears later.
+
+- `test_new_driver_default`  
+  Expectation: unknown driver has 0 wins.  
+  Result: **Pass**.
+
 ## Notes / Issues Encountered
 - Initial `pytest` invocation without setting the working directory tried to collect sibling project tests (`QuickCart`, `moneypoly`) and failed due to missing `requests`. Running from the project root avoids this.
 - Pytest’s built-in debugging plugin imports the stdlib `code` module; our package name `code` shadowed it, causing an `AttributeError` during configuration. Added `addopts = -p no:debugging` in `pytest.ini` to skip that plugin.
