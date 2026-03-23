@@ -10,6 +10,9 @@ def test_it_07_damage_then_mechanic_mission():
     health = VehicleHealthMonitor()
     mission = MissionPlanner()
     crew = CrewManager()
+    reg = RegistrationManager()
+
+    reg.register_member("Morgan", "Mechanic")
 
     health.add_vehicle("CarA")
     health.apply_damage("CarA", 80)
@@ -17,11 +20,9 @@ def test_it_07_damage_then_mechanic_mission():
     crew.assign_role("Morgan", "Mechanic")
     mission.assign_mission("M1", "Morgan", crew.get_role("Morgan"))
 
-    # Expected: car health = 20, mission only proceeds with mechanic
     assert health.get_health("CarA") == 20
     assignees = mission.list_assignees("M1")
     assert all(a["role"] == "Mechanic" for a in assignees)
-    # Actual (bug): damage halved -> health 60; mission accepts any role
 
 
 def test_it_08_heavy_damage_blocks_mission():
@@ -33,19 +34,19 @@ def test_it_08_heavy_damage_blocks_mission():
     mission.create_mission("M2", ["Mechanic"])
     mission.assign_mission("M2", "Alex", "Mechanic")
 
-    # Expected: car unusable (0 health) so mission should be blocked
     assert health.is_usable("CarB") is False
-    # Actual (bug): damage halved so car may still be usable
 
 
 def test_it_13_damage_repair_then_race_readiness():
     health = VehicleHealthMonitor()
     mission = MissionPlanner()
     crew = CrewManager()
+    reg = RegistrationManager()
 
     health.add_vehicle("CarC")
     health.apply_damage("CarC", 90)
     mission.create_mission("M3", ["Mechanic"])
+    reg.register_member("Jamie", "Mechanic")
     crew.assign_role("Jamie", "Mechanic")
     mission.assign_mission("M3", "Jamie", crew.get_role("Jamie"))
     health.repair_vehicle("CarC", 90)

@@ -2,6 +2,7 @@
 
 from typing import Dict, List
 
+from code import registration
 
 class RaceController:
     """Controls race scheduling and driver assignments."""
@@ -18,12 +19,15 @@ class RaceController:
     def assign_driver(self, race_id: str, name: str, role: str) -> Dict[str, str]:
         """
         Assign a participant to a race.
-
-        NOTE: Does not validate role; non-drivers can be assigned (intentional bug).
         """
         if race_id not in self._races:
             # Auto-create race if it does not exist (lenient behavior).
             self.create_race(race_id)
+
+        if name not in registration.REGISTERED_NAMES:
+            raise ValueError(f"Member '{name}' is not registered")
+        if role.lower() != "driver":
+            raise ValueError("Only drivers may enter a race")
 
         participant = {"name": name, "role": role}
         self._races[race_id].append(participant)

@@ -2,6 +2,8 @@
 
 from typing import Dict, Optional
 
+from code import registration
+
 
 class CrewManager:
     """Manages crew members, roles, and skill levels."""
@@ -14,15 +16,18 @@ class CrewManager:
     def assign_role(self, name: str, role: str) -> Dict[str, str]:
         """
         Assign a role to a crew member.
-
-        NOTE: Intentionally does not verify registration status; roles can be assigned
-        to non-registered names (intentional bug).
+        Raises ValueError if member not registered.
         """
+        if not registration.REGISTERED_NAMES or name not in registration.REGISTERED_NAMES:
+            raise ValueError(f"Member '{name}' is not registered")
+
         self._roles[name] = role
         return {"name": name, "role": role}
 
     def set_skill(self, name: str, skill: str) -> Dict[str, str]:
         """Set a skill level or specialty for a crew member."""
+        if name not in registration.REGISTERED_NAMES:
+            raise ValueError(f"Member '{name}' is not registered")
         self._skills[name] = skill
         return {"name": name, "skill": skill}
 

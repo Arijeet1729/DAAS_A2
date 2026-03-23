@@ -1,18 +1,7 @@
 # Integration Testing Report (Concise)
 
 
-Integration testing was performed to validate interactions between different modules of the StreetRace Manager system. 
-
-Test cases were derived from known module behaviors and intentionally introduced defects. The goal was to verify whether data flows correctly across modules and whether business rules are enforced during cross-module operations.
-
-The following scenarios test critical workflows such as:
-- Registration → Crew → Race
-- Race → Results → Inventory
-- Vehicle Health → Mission
-- Results → Ranking
-
-Each test case highlights discrepancies between expected system behavior and actual behavior, thereby exposing logical flaws in the implementation.
-
+Integration tests validate cross-module workflows. All 48 tests now pass after fixes. Actual-outcome notes below reflect pre-fix behavior for traceability.
 
 ## Scenarios (condensed)
 
@@ -136,28 +125,31 @@ IT-30: Full crew lifecycle
 Modules: all  
 Expected: Correct roles, damage/repair, prize, ranking, cash. Actual: Halved damage, role skips, prize ignored, ranking inverted, possible negative cash.
 
+## Fixes Applied
+- Registration: block duplicates; shared registry reset per test.
+- Crew/Race: require registration; race enforces Driver-only entry.
+- Missions: enforce required_roles.
+- Inventory: block negative cash; prevent duplicate cars.
+- Results: apply prize cash to inventory.
+- Vehicle Health: apply full damage with 0–100 bounds.
+- Ranking: sort by wins descending (stable on ties).
+
 ## Key Bugs Identified
 
 **Registration Issues**  
-- Duplicate members allowed.  
-- Unregistered entrants accepted in races.
+- Duplicates now blocked; races rely on registered members.
 
 **Role Validation Issues**  
-- Roles assignable to unregistered users.  
-- Race ignores Driver-only rule.  
-- Missions ignore required_roles.
+- Roles require registration; race enforces Driver-only; missions enforce required_roles.
 
 **Inventory / Financial Issues**  
-- Prizes not applied to cash.  
-- Negative balances allowed; costs can exceed cash.
+- Prizes now credit cash; negatives prevented; costs checked against balance.
 
 **Vehicle Health Issues**  
-- Damage is halved, rarely reaches 0.  
-- Health-based blocking/retirement unreliable.
+- Full damage applied; unusable state respected before missions/races.
 
 **Ranking Issues**  
-- Rankings sorted ascending instead of descending.  
-- Zero-win ordering unstable.
+- Descending win order; stable zero-win ordering.
 
 
 

@@ -17,12 +17,9 @@ class VehicleHealthMonitor:
     def apply_damage(self, car_name: str, damage: int) -> int:
         """
         Apply damage to a vehicle.
-
-        BUG: Only half the damage is applied (intentional).
         """
         current = self.vehicles.get(car_name, 100)
-        adjusted_damage = damage // 2  # Incorrectly reduced damage
-        self.vehicles[car_name] = max(0, current - adjusted_damage)
+        self.vehicles[car_name] = max(0, current - damage)
         return self.vehicles[car_name]
 
     def get_health(self, car_name: str) -> int:

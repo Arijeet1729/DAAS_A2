@@ -13,19 +13,19 @@ class InventoryManager:
     def add_car(self, car: str) -> str:
         """
         Add a car to the inventory.
-
-        NOTE: Allows duplicate entries; no validation is performed.
         """
-        self._cars.append(car)
+        if car not in self._cars:
+            self._cars.append(car)
         return car
 
     def update_cash(self, amount: float) -> float:
         """
         Update cash balance by the specified amount.
-
-        NOTE: Negative balances are allowed (intentional bug); no validation is performed.
         """
-        self.cash += amount
+        new_cash = self.cash + amount
+        if new_cash < 0:
+            raise ValueError("Insufficient funds")
+        self.cash = new_cash
         return self.cash
 
     def list_cars(self) -> List[str]:

@@ -17,10 +17,8 @@ class RankingCalculator:
     def get_rankings(self) -> List[Tuple[str, int]]:
         """
         Return rankings sorted by wins.
-
-        BUG: Sorted in ascending order instead of descending.
         """
-        return sorted(self.rankings.items(), key=lambda item: item[1])
+        return sorted(self.rankings.items(), key=lambda item: (-item[1], item[0]))
 
     def get_wins(self, driver_name: str) -> int:
         """Return total wins for the driver (0 if absent)."""

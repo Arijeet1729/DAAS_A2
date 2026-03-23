@@ -17,12 +17,14 @@ class MissionPlanner:
     def assign_mission(self, mission_id: str, name: str, role: str) -> Dict[str, str]:
         """
         Assign a crew member to a mission.
-
-        BUG: Does not validate if the role is in required_roles (intentional).
         """
         if mission_id not in self._missions:
             # Auto-create with no requirements if missing
             self.create_mission(mission_id, [])
+
+        required_roles = self._missions[mission_id]["required_roles"]
+        if required_roles and role not in required_roles:
+            raise ValueError(f"Role '{role}' not permitted; requires one of {required_roles}")
 
         assignment = {"name": name, "role": role}
         self._missions[mission_id]["assignees"].append(assignment)

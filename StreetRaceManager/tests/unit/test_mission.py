@@ -18,10 +18,5 @@ def test_assign_non_required_role_should_fail():
     planner = MissionPlanner()
     planner.create_mission("mission-2", ["Driver"])
 
-    planner.assign_mission("mission-2", "Sam", "Mechanic")
-
-    assignees = planner.list_assignees("mission-2")
-
-    # Logical expectation: only required roles should be accepted.
-    # Actual (intentional bug): non-required role is accepted.
-    assert all(a["role"] in ["Driver"] for a in assignees)
+    with pytest.raises(ValueError):
+        planner.assign_mission("mission-2", "Sam", "Mechanic")

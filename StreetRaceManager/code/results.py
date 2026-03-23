@@ -12,15 +12,12 @@ class ResultsTracker:
         self._history: List[Dict[str, str]] = []
 
     def record_winner(self, race_id: str, winner: str, prize: float = 0.0, inventory=None) -> Dict[str, str]:
-        """
-        Record the winner of a race and optionally update inventory cash.
-
-        BUG: Intentionally does not update inventory cash even when prize is provided.
-        """
+        """Record the winner of a race and optionally update inventory cash."""
         self._winners[race_id] = winner
         self._history.append({"race_id": race_id, "winner": winner, "prize": prize})
 
-        # Intended bug: skip updating inventory cash
+        if inventory is not None and prize:
+            inventory.update_cash(prize)
         return {"race_id": race_id, "winner": winner, "prize": prize}
 
     def get_winner(self, race_id: str) -> Optional[str]:
