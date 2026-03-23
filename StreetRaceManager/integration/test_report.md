@@ -1,5 +1,19 @@
 # Integration Testing Report (Concise)
 
+
+Integration testing was performed to validate interactions between different modules of the StreetRace Manager system. 
+
+Test cases were derived from known module behaviors and intentionally introduced defects. The goal was to verify whether data flows correctly across modules and whether business rules are enforced during cross-module operations.
+
+The following scenarios test critical workflows such as:
+- Registration → Crew → Race
+- Race → Results → Inventory
+- Vehicle Health → Mission
+- Results → Ranking
+
+Each test case highlights discrepancies between expected system behavior and actual behavior, thereby exposing logical flaws in the implementation.
+
+
 ## Test Outcomes
 - Expected to pass ideally: IT-01, IT-12, IT-13, IT-15, IT-16  
 - Expected to fail (known bugs): IT-02–IT-11, IT-14, IT-17–IT-30
