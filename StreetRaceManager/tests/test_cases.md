@@ -39,6 +39,14 @@ Environment: Python 3.14, virtualenv `.venv`, pytest 9.0.2.
   Expectation (logical): non-driver roles should not be allowed in a race.  
   Actual: **Failed** — role "Mechanic" accepted (intentional bug), assertion that all roles equal "Driver" fails.
 
+- `test_record_winner_stores_result`  
+  Expectation: recording a winner stores the winner and prize data.  
+  Result: **Pass** (`pytest -q tests/unit/test_results.py`).
+
+- `test_prize_cash_updates_inventory_should_fail`  
+  Expectation (logical): prize cash should increase inventory balance.  
+  Actual: **Failed** — cash remains `0.0` (intentional bug), assertion expecting `500.0` fails.
+
 ## Notes / Issues Encountered
 - Initial `pytest` invocation without setting the working directory tried to collect sibling project tests (`QuickCart`, `moneypoly`) and failed due to missing `requests`. Running from the project root avoids this.
 - Pytest’s built-in debugging plugin imports the stdlib `code` module; our package name `code` shadowed it, causing an `AttributeError` during configuration. Added `addopts = -p no:debugging` in `pytest.ini` to skip that plugin.
