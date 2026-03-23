@@ -31,6 +31,14 @@ Environment: Python 3.14, virtualenv `.venv`, pytest 9.0.2.
   Expectation (logical): cash balance should not become negative.  
   Actual: **Failed** — balance goes to `-500.0` (intentional bug), assertion `cash >= 0` fails.
 
+- `test_assign_driver_success`  
+  Expectation: assigning a driver to a race stores the participant.  
+  Result: **Pass** (`pytest -q tests/unit/test_race.py`).
+
+- `test_assign_non_driver_should_fail`  
+  Expectation (logical): non-driver roles should not be allowed in a race.  
+  Actual: **Failed** — role "Mechanic" accepted (intentional bug), assertion that all roles equal "Driver" fails.
+
 ## Notes / Issues Encountered
 - Initial `pytest` invocation without setting the working directory tried to collect sibling project tests (`QuickCart`, `moneypoly`) and failed due to missing `requests`. Running from the project root avoids this.
 - Pytest’s built-in debugging plugin imports the stdlib `code` module; our package name `code` shadowed it, causing an `AttributeError` during configuration. Added `addopts = -p no:debugging` in `pytest.ini` to skip that plugin.

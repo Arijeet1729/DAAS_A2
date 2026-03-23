@@ -1,14 +1,34 @@
 """Race orchestration module."""
 
+from typing import Dict, List
+
 
 class RaceController:
-    """Controls race scheduling and execution."""
+    """Controls race scheduling and driver assignments."""
 
-    def schedule_race(self, race_details):
-        """Schedule a new race."""
-        pass
+    def __init__(self) -> None:
+        # Map race_id -> list of participants (name, role).
+        self._races: Dict[str, List[Dict[str, str]]] = {}
 
-    def start_race(self, race_id):
-        """Start a race."""
-        pass
+    def create_race(self, race_id: str) -> Dict[str, List[Dict[str, str]]]:
+        """Create a new race with the given identifier."""
+        self._races[race_id] = []
+        return {race_id: self._races[race_id]}
 
+    def assign_driver(self, race_id: str, name: str, role: str) -> Dict[str, str]:
+        """
+        Assign a participant to a race.
+
+        NOTE: Does not validate role; non-drivers can be assigned (intentional bug).
+        """
+        if race_id not in self._races:
+            # Auto-create race if it does not exist (lenient behavior).
+            self.create_race(race_id)
+
+        participant = {"name": name, "role": role}
+        self._races[race_id].append(participant)
+        return participant
+
+    def list_participants(self, race_id: str) -> List[Dict[str, str]]:
+        """List participants for a given race."""
+        return list(self._races.get(race_id, []))
