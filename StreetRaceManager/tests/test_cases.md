@@ -47,6 +47,14 @@ Environment: Python 3.14, virtualenv `.venv`, pytest 9.0.2.
   Expectation (logical): prize cash should increase inventory balance.  
   Actual: **Failed** — cash remains `0.0` (intentional bug), assertion expecting `500.0` fails.
 
+- `test_assign_required_role_success`  
+  Expectation: assigning a required role succeeds.  
+  Result: **Pass** (`pytest -q tests/unit/test_mission.py`).
+
+- `test_assign_non_required_role_should_fail`  
+  Expectation (logical): non-required roles should be rejected.  
+  Actual: **Failed** — "Mechanic" accepted despite required role "Driver".
+
 ## Notes / Issues Encountered
 - Initial `pytest` invocation without setting the working directory tried to collect sibling project tests (`QuickCart`, `moneypoly`) and failed due to missing `requests`. Running from the project root avoids this.
 - Pytest’s built-in debugging plugin imports the stdlib `code` module; our package name `code` shadowed it, causing an `AttributeError` during configuration. Added `addopts = -p no:debugging` in `pytest.ini` to skip that plugin.
